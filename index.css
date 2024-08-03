@@ -37,3 +37,16 @@ button {
 button:hover {
   background-color: #45a049;
 }
+#displayArea {
+  margin-top: 20px;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+}
+
+#displayArea div {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
