@@ -50,6 +50,34 @@ app.get("/appointments", (req, res) => {
   });
 });
 
+app.delete("/delete/:id", (req, res) => {
+  const { id } = req.params;
+  const query = "DELETE  FROM form_table WHERE id= ?";
+  db.query(query, (err, results) => {
+    if (err) {
+      console.log("Error Deleting Data");
+      res.status(500).send("Error Deleting Data");
+      return;
+    }
+    res.status(200).send("Data Deleted Successfully");
+  });
+});
+
+app.put("/update/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, phone, email } = req.body;
+  const query =
+    "UPDATE form_table SET name = ?, phone = ?, email = ? WHERE id = ?";
+  db.query(query, [name, phone, email, id], (err, results) => {
+    if (err) {
+      console.log("Error Updating Data");
+      res.status(500).send("Error Updating Data");
+      return;
+    }
+    res.status(200).send("Data Updated Successfully");
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
