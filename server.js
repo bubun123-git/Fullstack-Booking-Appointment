@@ -52,8 +52,8 @@ app.get("/appointments", (req, res) => {
 
 app.delete("/delete/:id", (req, res) => {
   const { id } = req.params;
-  const query = "DELETE  FROM form_table WHERE id= ?";
-  db.query(query, (err, results) => {
+  const query = "DELETE FROM form_table WHERE id = ?";
+  db.query(query, [id], (err, results) => {
     if (err) {
       console.log("Error Deleting Data");
       res.status(500).send("Error Deleting Data");

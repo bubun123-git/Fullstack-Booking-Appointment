@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <p>Name: ${entry.name}</p>
             <p>Phone: ${entry.phone}</p>
             <p>Email: ${entry.email}</p>
-            <button onclick="editEntry(${entry.id}, '${entry.name}', '${entry.phone}')">Edit</button>
+            <button onclick="editEntry(${entry.id}, '${entry.name}', '${entry.phone}', '${entry.email}')">Edit</button><br/>
             <button onclick="deleteEntry(${entry.id})">Delete</button>
           `;
           displayArea.appendChild(newEntry);
@@ -23,10 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Error", err);
       });
   };
-  
- fetchData();
 
-  form.addEventListener("submit", (event) => {
+  // Fetch data when DOM is loaded
+  fetchData();
+
+  const defaultFormSubmit = (event) => {
     event.preventDefault();
 
     let name = document.getElementById("username").value;
@@ -42,42 +43,45 @@ document.addEventListener("DOMContentLoaded", () => {
       .then((response) => {
         console.log(response.data);
         alert(response.data);
+        fetchData();
+        form.reset();
       })
       .catch((err) => {
         console.log("Error", err);
       });
-  });
-});
+  };
 
-//delete
-window.deleteEntry = (id) => {
-  axios
-    .delete(`http://localhost:300/delete/${id}`)
-    .then((res) => {
-      console.log(res.data);
-      fetchData();
-    })
-    .catch((err) => {
-      console.log("error", err);
-    });
-};
+  // Set the default form submit handler
+  form.addEventListener("submit", defaultFormSubmit);
 
-//edit
-window.editEntry = (id, name, phone, email) => {
-  document.getElementById("username").value = name;
-  document.getElementById("phone").value = phone;
-  document.getElementById("email").value = email;
+  window.deleteEntry = (id) => {
+    axios.delete(`http://localhost:3000/delete/${id}`)
+      .then((res) => {
+        console.log(res.data);
+        console.log('Data Deleted Successfully');
+        
+        fetchData();
+      })
+      .catch((err) => {
+        console.log("error", err);
+      });
+  };
 
-  let form = document.getElementById("appointmentForm");
-  form.onsubmit = (event) => {
-    event.preventDefault();
+  window.editEntry = (id, name, phone, email) => {
+    document.getElementById("username").value = name;
+    document.getElementById("phone").value = phone;
+    document.getElementById("email").value = email;
 
-    let updatedName = document.getElementById("username").value;
-    let updatedPhone = document.getElementById("phone").value;
-    let updatedEmail = document.getElementById("email").value;
+    form.removeEventListener("submit", defaultFormSubmit);
 
-    axios
-      .put(`http://localhost:3000/update/${id}`, {
+    const editFormSubmit = (event) => {
+      event.preventDefault();
+
+      let updatedName = document.getElementById("username").value;
+      let updatedPhone = document.getElementById("phone").value;
+      let updatedEmail = document.getElementById("email").value;
+
+      axios.put(`http://localhost:3000/update/${id}`, {
         name: updatedName,
         phone: updatedPhone,
         email: updatedEmail,
@@ -86,10 +90,15 @@ window.editEntry = (id, name, phone, email) => {
         console.log(res.data);
         alert(res.data);
         fetchData();
-        form.onsubmit = null; // Reset form submission
+        form.reset();
+        form.removeEventListener("submit", editFormSubmit);
+        form.addEventListener("submit", defaultFormSubmit);
       })
       .catch((err) => {
         console.log("error", err);
       });
+    };
+
+    form.addEventListener("submit", editFormSubmit);
   };
-};
+});
